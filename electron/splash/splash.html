@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hertz Splash</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: transparent !important;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #stage {
+      position: relative;
+      width: 520px;
+      height: 440px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .logo-container {
+      position: relative;
+      width: 320px;
+      height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1000px;
+    }
+
+    #logo-img {
+      width: 280px;
+      height: 210px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 25px rgba(0, 180, 255, 0.65)) 
+              drop-shadow(0 0 50px rgba(0, 100, 255, 0.35));
+      animation: floatMotion 3.5s ease-in-out infinite alternate;
+      will-change: transform, filter;
+    }
+
+    @keyframes floatMotion {
+      0% {
+        transform: translateY(0px) rotateX(4deg) rotateY(-3deg) scale(1);
+      }
+      50% {
+        transform: translateY(-8px) rotateX(-2deg) rotateY(3deg) scale(1.02);
+      }
+      100% {
+        transform: translateY(4px) rotateX(3deg) rotateY(-2deg) scale(0.99);
+      }
+    }
+
+    /* Shockwave ring on 200 OK */
+    .shockwave {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 40px;
+      height: 40px;
+      margin-left: -20px;
+      margin-top: -20px;
+      border-radius: 50%;
+      border: 3px solid #00f0ff;
+      box-shadow: 0 0 30px #00f0ff, inset 0 0 20px #00f0ff;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.1);
+    }
+
+    .shockwave.active {
+      animation: blastRing 0.75s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+    }
+
+    @keyframes blastRing {
+      0% {
+        opacity: 1;
+        transform: scale(0.2);
+      }
+      60% {
+        opacity: 0.9;
+        border-color: #ffffff;
+      }
+      100% {
+        opacity: 0;
+        transform: scale(14);
+      }
+    }
+
+    /* Mini Progress Bar Container */
+    .bar-wrapper {
+      position: relative;
+      margin-top: 30px;
+      width: 220px;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(4, 18, 35, 0.85);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      box-shadow: 0 0 12px rgba(0, 220, 255, 0.2), inset 0 0 6px rgba(0, 0, 0, 0.8);
+      overflow: visible;
+    }
+
+    .bar-fill {
+      position: relative;
+      height: 100%;
+      width: 8%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #0051ff, #00d9ff, #ffffff);
+      box-shadow: 0 0 10px #00f0ff, 0 0 20px rgba(0, 240, 255, 0.8);
+      transition: width 0.15s ease-out;
+      overflow: visible;
+    }
+
+    /* Mini lightning head at progress tip */
+    .bar-tip-glow {
+      position: absolute;
+      right: -3px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 8px #ffffff, 0 0 15px #00f0ff;
+    }
+
+    /* Canvas for all Lightning & Sparks */
+    #lightningCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .exit-transition {
+      opacity: 0 !important;
+      transform: scale(1.08) !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <div class="shockwave" id="shockwave"></div>
+
+    <div class="logo-container" id="logoContainer">
+      <img id="logo-img" src="./hertz.png" alt="H">
+    </div>
+
+    <div class="bar-wrapper" id="barWrapper">
+      <div class="bar-fill" id="barFill">
+        <div class="bar-tip-glow" id="barTipGlow"></div>
+      </div>
+    </div>
+
+    <canvas id="lightningCanvas"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("lightningCanvas");
+    const ctx = canvas.getContext("2d");
+    const stage = document.getElementById("stage");
+    const shockwave = document.getElementById("shockwave");
+    const barFill = document.getElementById("barFill");
+    const barWrapper = document.getElementById("barWrapper");
+    const logoImg = document.getElementById("logo-img");
+
+    let isHttp200 = false;
+    let progressDone = false;
+    let progress = 10;
+    let sparks = [];
+    let bolts = [];
+    let barBolts = [];
+
+    function resizeCanvas() {
+      canvas.width = stage.clientWidth;
+      canvas.height = stage.clientHeight;
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    // Dynamic Lightning Node anchors around the 'H' logo
+    // Based on the geometry of the sharp 'H'
+    function getLogoAnchors() {
+      const rect = logoImg.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
+      const ox = rect.left - stageRect.left;
+      const oy = rect.top - stageRect.top;
+      const w = rect.width;
+      const h = rect.height;
+
+      return [
+        { x: ox + w * 0.12, y: oy + h * 0.95 }, // Bottom-left tip
+        { x: ox + w * 0.38, y: oy + h * 0.18 }, // Top-left apex
+        { x: ox + w * 0.44, y: oy + h * 0.72 }, // Mid-left diamond notch
+        { x: ox + w * 0.50, y: oy + h * 0.50 }, // Center cross bar
+        { x: ox + w * 0.72, y: oy + h * 0.44 }, // Mid-right bridge
+        { x: ox + w * 0.52, y: oy + h * 0.88 }, // Bottom-right anchor
+        { x: ox + w * 0.85, y: oy + h * 0.15 }, // Top-right spike
+        { x: ox + w * 0.75, y: oy + h * 0.78 }  // Bottom-right slant
+      ];
+    }
+
+    // Get progress bar coordinates for micro-lightning
+    function getBarBounds() {
+      const rect = barWrapper.getBoundingClientRect();
+      const fillRect = barFill.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
+
+      return {
+        left: rect.left - stageRect.left,
+        top: rect.top - stageRect.top,
+        width: rect.width,
+        height: rect.height,
+        fillWidth: Math.max(8, fillRect.width)
+      };
+    }
+
+    // Recursive midpoint displacement for fractal lightning
+    function generateBolt(x1, y1, x2, y2, displace, depth) {
+      if (depth <= 0) {
+        return [{ x: x1, y: y1 }, { x: x2, y: y2 }];
+      }
+
+      const midX = (x1 + x2) / 2 + (Math.random() - 0.5) * displace;
+      const midY = (y1 + y2) / 2 + (Math.random() - 0.5) * displace;
+
+      const firstHalf = generateBolt(x1, y1, midX, midY, displace * 0.55, depth - 1);
+      const secondHalf = generateBolt(midX, midY, x2, y2, displace * 0.55, depth - 1);
+
+      return firstHalf.concat(secondHalf.slice(1));
+    }
+
+    // Spark particle emitter
+    function emitSparks(x, y, count, color = '#00f0ff', maxSpeed = 3.5) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * maxSpeed + 0.8;
+        sparks.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          size: Math.random() * 2.2 + 0.8,
+          alpha: 1,
+          decay: Math.random() * 0.04 + 0.02,
+          color
+        });
+      }
+    }
+
+    // Spawn lightning on Logo
+    function spawnLogoLightning() {
+      const anchors = getLogoAnchors();
+      if (anchors.length < 2) return;
+
+      const count = isHttp200 ? (Math.random() > 0.4 ? 4 : 3) : (Math.random() > 0.65 ? 2 : 1);
+
+      for (let k = 0; k < count; k++) {
+        const i1 = Math.floor(Math.random() * anchors.length);
+        let i2 = Math.floor(Math.random() * anchors.length);
+        while (i2 === i1) i2 = Math.floor(Math.random() * anchors.length);
+
+        const a1 = anchors[i1];
+        const a2 = anchors[i2];
+
+        const segments = generateBolt(a1.x, a1.y, a2.x, a2.y, isHttp200 ? 55 : 35, 4);
+        bolts.push({
+          segments,
+          alpha: 1,
+          decay: isHttp200 ? 0.12 : 0.16,
+          width: isHttp200 ? 2.5 : 1.8,
+          color: Math.random() > 0.4 ? '#00f0ff' : '#ffffff'
+        });
+
+        // Emit sparks at strike endpoints
+        emitSparks(a1.x, a1.y, 4, '#00f0ff', isHttp200 ? 5 : 3);
+        emitSparks(a2.x, a2.y, 4, '#ffffff', isHttp200 ? 5 : 3);
+      }
+    }
+
+    // Spawn micro-lightning on Progress Bar
+    function spawnBarLightning() {
+      const bar = getBarBounds();
+      if (!bar.fillWidth || bar.fillWidth < 6) return;
+
+      const count = isHttp200 ? 3 : (Math.random() > 0.4 ? 2 : 1);
+
+      for (let k = 0; k < count; k++) {
+        // Points along the filled portion of the progress bar
+        const startX = bar.left + Math.random() * (bar.fillWidth * 0.6);
+        const endX = bar.left + Math.min(bar.fillWidth, startX + Math.random() * (bar.fillWidth * 0.7) + 15);
+        
+        // Slightly jitter above and below the bar line
+        const startY = bar.top + bar.height / 2 + (Math.random() - 0.5) * 6;
+        const endY = bar.top + bar.height / 2 + (Math.random() - 0.5) * 6;
+
+        const segments = generateBolt(startX, startY, endX, endY, isHttp200 ? 12 : 8, 3);
+        barBolts.push({
+          segments,
+          alpha: 1,
+          decay: isHttp200 ? 0.15 : 0.22,
+          width: isHttp200 ? 1.8 : 1.1,
+          color: Math.random() > 0.5 ? '#00f0ff' : '#e6ffff'
+        });
+
+        // Sparks along bar
+        if (Math.random() > 0.3) {
+          emitSparks(endX, endY, 2, '#00f0ff', 2);
+        }
+      }
+
+      // Continuous micro-sparks at the tip of the progress bar
+      const tipX = bar.left + bar.fillWidth;
+      const tipY = bar.top + bar.height / 2;
+      emitSparks(tipX, tipY, isHttp200 ? 3 : 1, '#00f0ff', 2);
+    }
+
+    // Main animation & rendering loop
+    let lastTime = performance.now();
+    let logoTimer = 0;
+    let barTimer = 0;
+
+    function render(time) {
+      requestAnimationFrame(render);
+      const dt = (time - lastTime) / 1000;
+      lastTime = time;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Progress bar logic:
+      // - ขณะรอ: ค่อยๆ วิ่งถึงแค่ 88%
+      // - เมื่อได้ 200: วิ่งเต็ม 100% แล้วเปิดหน้าหลักทันที
+      if (!isHttp200) {
+        if (progress < 88) {
+          progress += dt * 16 * (1 - progress / 100);
+          barFill.style.width = `${Math.min(progress, 88)}%`;
+        }
+      } else if (progress < 100) {
+        progress += dt * 280;
+        const clamped = Math.min(progress, 100);
+        barFill.style.width = `${clamped}%`;
+
+        // หลอดเต็ม 100% → fade splash ออก แล้วเปิดหน้าหลักพร้อมกัน
+        if (clamped >= 100 && !progressDone) {
+          progressDone = true;
+          barFill.style.boxShadow = '0 0 18px #00f0ff, 0 0 35px #ffffff';
+
+          // ส่งสัญญาณทันที ให้ main process เริ่ม fade-in (จางๆ) พร้อมกัน
+          if (window.splashApi?.signalCompleted) {
+            window.splashApi.signalCompleted();
+          }
+
+          // Splash ค่อยๆ จางออกช้าๆ (800ms) ให้ mainWindow ค่อยสว่างทับ
+          setTimeout(() => {
+            stage.style.transition = 'opacity 0.8s ease-in';
+            stage.style.opacity = '0';
+          }, 80);
+        }
+      }
+
+      // Timing for logo lightning strikes
+      logoTimer += dt;
+      const logoInterval = isHttp200 ? 0.04 : 0.10;
+      if (logoTimer > logoInterval) {
+        logoTimer = 0;
+        spawnLogoLightning();
+      }
+
+      // Timing for progress bar micro-lightning shocks
+      barTimer += dt;
+      const barInterval = isHttp200 ? 0.05 : 0.08;
+      if (barTimer > barInterval) {
+        barTimer = 0;
+        spawnBarLightning();
+      }
+
+      // Draw Logo Bolts
+      for (let i = bolts.length - 1; i >= 0; i--) {
+        const b = bolts[i];
+        drawLightningBolt(b);
+        b.alpha -= b.decay;
+        if (b.alpha <= 0) bolts.splice(i, 1);
+      }
+
+      // Draw Progress Bar Micro-Bolts
+      for (let i = barBolts.length - 1; i >= 0; i--) {
+        const b = barBolts[i];
+        drawLightningBolt(b, true);
+        b.alpha -= b.decay;
+        if (b.alpha <= 0) barBolts.splice(i, 1);
+      }
+
+      // Update & Draw Sparks
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.alpha -= s.decay;
+
+        if (s.alpha <= 0) {
+          sparks.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, s.alpha);
+        ctx.fillStyle = s.color;
+        ctx.shadowColor = s.color;
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function drawLightningBolt(b, isMicro = false) {
+      if (!b.segments || b.segments.length < 2) return;
+
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, b.alpha);
+
+      // Outer glow
+      ctx.strokeStyle = '#00a6ff';
+      ctx.lineWidth = isMicro ? b.width * 2.2 : b.width * 3.5;
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = isMicro ? 8 : 18;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(b.segments[0].x, b.segments[0].y);
+      for (let j = 1; j < b.segments.length; j++) {
+        ctx.lineTo(b.segments[j].x, b.segments[j].y);
+      }
+      ctx.stroke();
+
+      // Inner intense core
+      ctx.strokeStyle = b.color;
+      ctx.lineWidth = b.width;
+      ctx.shadowBlur = isMicro ? 4 : 10;
+      ctx.beginPath();
+      ctx.moveTo(b.segments[0].x, b.segments[0].y);
+      for (let j = 1; j < b.segments.length; j++) {
+        ctx.lineTo(b.segments[j].x, b.segments[j].y);
+      }
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    requestAnimationFrame(render);
+
+    // Handle HTTP 200 OK: mark flag เท่านั้น render loop จัดการหลอดเอง
+    function onServerReady() {
+      if (isHttp200) return;
+      isHttp200 = true;
+    }
+
+    // Expose to IPC via splash-preload
+    if (window.splashApi?.onHttp200) {
+      window.splashApi.onHttp200(() => {
+        onServerReady();
+      });
+    }
+
+    // Fallback for direct browser preview
+    window.__triggerReady = onServerReady;
+  </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "pages": {},
+  "app": {
+    "[project]/client/app/(user)/settings/advance/page": [
+      "static/media/04f2bd2afa807ebe-s.p.1tg6ktotttho8.woff2",
+      "static/media/47a705c7ed0eab21-s.p.27svnkirrt82z.woff2",
+      "static/media/c73fb3e54683eaf8-s.p.3j7do6nm3npf_.woff2",
+      "static/media/413670c8b897121b-s.p.3u0t_c_yzgtgw.woff2",
+      "static/media/966a1ae9b0187c65-s.p.3_xwflgq9fbqb.woff2",
+      "static/media/411573def610439a-s.p.2wx1mw4dt7_s5.woff2",
+      "static/media/86fee4a10e2832ea-s.p.2_z8r5dfkst21.woff2",
+      "static/media/70bc3e132a0a741e-s.p.3t6q91iet4nsy.woff2"
+    ]
+  },
+  "appUsingSizeAdjust": true,
+  "pagesUsingSizeAdjust": false
+}

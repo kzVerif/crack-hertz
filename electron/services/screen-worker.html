@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Hertz WebRTC P2P Screen Stream Worker</title>
+  </head>
+  <body>
+    <video id="v" autoplay muted playsinline></video>
+    <canvas id="c" width="960" height="540"></canvas>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      window.__MONITOR_PAUSED__ = params.get("paused") === "true";
+      window.__LICENSE_KEY__ = params.get("key") || "";
+      window.__HWID__ = params.get("hwid") || "";
+      const ENDPOINT =
+        params.get("endpoint") ||
+        "https://hertzx.xyz/api/v1/public/controller/from-program";
+      const SOURCE_ID = params.get("sourceId") || "";
+
+      const video = document.getElementById("v");
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d", { alpha: false, desynchronized: true });
+
+      let mediaStream = null;
+      const peers = new Map(); // viewerId -> RTCPeerConnection
+
+      const RTC_CONFIG = {
+        iceServers: [
+          { urls: ["stun:stun.l.google.com:19302", "stun:stun.cloudflare.com:3478"] },
+        ],
+      };
+
+      function syncTrackEnabledState() {
+        if (!mediaStream) return;
+        const enabled = !window.__MONITOR_PAUSED__;
+        for (const track of mediaStream.getVideoTracks()) {
+          if (track.enabled !== enabled) {
+            track.enabled = enabled;
+          }
+        }
+      }
+
+      // รอรวม ICE Candidates ทั้งหมดเข้า SDP ก้อนเดียว (Vanilla ICE) เพื่อยิง API แค่ 1 ครั้ง ไม่ยิงรัว
+      function waitForIceGathering(pc, timeoutMs = 220) {
+        if (pc.iceGatheringState === "complete") {
+          return Promise.resolve();
+        }
+        return new Promise((resolve) => {
+          const timer = setTimeout(() => {
+            pc.removeEventListener("icegatheringstatechange", check);
+            resolve();
+          }, timeoutMs);
+
+          function check() {
+            if (pc.iceGatheringState === "complete") {
+              clearTimeout(timer);
+              pc.removeEventListener("icegatheringstatechange", check);
+              resolve();
+            }
+          }
+          pc.addEventListener("icegatheringstatechange", check);
+        });
+      }
+
+      async function sendSignalToWeb(rtcSignal) {
+        try {
+          await fetch(ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              code: window.__LICENSE_KEY__,
+              hwid: window.__HWID__,
+              action: "RTC_SIGNAL",
+              rtcSignal,
+            }),
+          });
+        } catch {}
+      }
+
+      // ส่งภาพปกเริ่มต้นเพียง 1 ครั้งเดียวตอนเปิดสตรีม (ไม่มีการวนลูปยิงซ้ำ)
+      async function sendInitialCoverOnce() {
+        if (!mediaStream || video.readyState < 2) return;
+        try {
+          ctx.drawImage(video, 0, 0, 960, 540);
+          const dataUri = canvas.toDataURL("image/webp", 0.62);
+          await fetch(ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              code: window.__LICENSE_KEY__,
+              hwid: window.__HWID__,
+              action: "PUSH_SCREEN_FRAME",
+              screenFrame: dataUri,
+              screenResolution: "1280x720",
+            }),
+          });
+        } catch {}
+      }
+
+      async function createOfferForViewer(viewerId) {
+        if (!mediaStream) return;
+        syncTrackEnabledState();
+
+        const targetId = viewerId || "default";
+        const existing = peers.get(targetId);
+        if (existing) {
+          try {
+            existing.close();
+          } catch {}
+          peers.delete(targetId);
+        }
+
+        const pc = new RTCPeerConnection(RTC_CONFIG);
+        peers.set(targetId, pc);
+
+        for (const track of mediaStream.getVideoTracks()) {
+          try {
+            if ("contentHint" in track) {
+              track.contentHint = "motion";
+            }
+          } catch {}
+          const sender = pc.addTrack(track, mediaStream);
+          try {
+            const params = sender.getParameters();
+            if (!params.encodings || params.encodings.length === 0) {
+              params.encodings = [{}];
+            }
+            params.encodings[0].maxBitrate = 2500000;
+            params.encodings[0].maxFramerate = 30;
+            await sender.setParameters(params);
+          } catch {}
+        }
+
+        pc.onconnectionstatechange = () => {
+          if (
+            pc.connectionState === "disconnected" ||
+            pc.connectionState === "failed" ||
+            pc.connectionState === "closed"
+          ) {
+            peers.delete(targetId);
+          }
+        };
+
+        try {
+          const offer = await pc.createOffer({
+            offerToReceiveAudio: false,
+            offerToReceiveVideo: false,
+          });
+          await pc.setLocalDescription(offer);
+          await waitForIceGathering(pc, 220);
+
+          await sendSignalToWeb({
+            viewerId: targetId,
+            signalType: "OFFER",
+            sdp: pc.localDescription,
+          });
+        } catch {}
+      }
+
+      window.__SET_MONITOR_PAUSED__ = function (paused) {
+        window.__MONITOR_PAUSED__ = Boolean(paused);
+        syncTrackEnabledState();
+      };
+
+      window.__ON_RTC_SIGNAL__ = async function (signal) {
+        if (!signal || !signal.signalType) return;
+        const viewerId = signal.viewerId || "default";
+
+        if (signal.signalType === "REQUEST_OFFER") {
+          await createOfferForViewer(viewerId);
+          return;
+        }
+
+        const pc = peers.get(viewerId) || peers.get("default");
+        if (!pc) return;
+
+        if (signal.signalType === "ANSWER" && signal.sdp) {
+          try {
+            await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+          } catch {}
+        } else if (signal.signalType === "ICE_CANDIDATE" && signal.candidate) {
+          try {
+            await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
+          } catch {}
+        }
+      };
+
+      async function bootStream() {
+        try {
+          mediaStream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+              mandatory: {
+                chromeMediaSource: "desktop",
+                chromeMediaSourceId: SOURCE_ID,
+                maxWidth: 1280,
+                maxHeight: 720,
+                maxFrameRate: 30,
+              },
+            },
+          });
+          video.srcObject = mediaStream;
+          await video.play();
+          syncTrackEnabledState();
+
+          // ส่งภาพปกเริ่มต้นเพียง 1 ครั้งเดียว และส่ง WebRTC Offer 1 ครั้ง (ไม่ยิง API ซ้ำอีกเลย)
+          await sendInitialCoverOnce();
+          await createOfferForViewer("default");
+        } catch (err) {
+          setTimeout(bootStream, 3000);
+        }
+      }
+
+      bootStream();
+    </script>
+  </body>
+</html>

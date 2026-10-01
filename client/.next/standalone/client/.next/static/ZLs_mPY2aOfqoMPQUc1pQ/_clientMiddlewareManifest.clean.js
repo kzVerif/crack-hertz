@@ -1,0 +1,4 @@
+self.__MIDDLEWARE_MATCHERS = [];
+if (self.__MIDDLEWARE_MATCHERS_CB) {
+  self.__MIDDLEWARE_MATCHERS_CB();
+}

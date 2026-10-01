@@ -1,0 +1,15 @@
+{
+  "/(user)/accounts/page": "/accounts",
+  "/(user)/logger/page": "/logger",
+  "/(user)/page": "/",
+  "/(user)/settings/advance/page": "/settings/advance",
+  "/(user)/settings/data/page": "/settings/data",
+  "/(user)/settings/help/page": "/settings/help",
+  "/(user)/settings/page": "/settings",
+  "/(user)/settings/update/page": "/settings/update",
+  "/(user)/worker/page": "/worker",
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/auth/page": "/auth",
+  "/favicon.ico/route": "/favicon.ico"
+}

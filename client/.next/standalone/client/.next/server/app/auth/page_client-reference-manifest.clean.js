@@ -1,0 +1,314 @@
+globalThis.__RSC_MANIFEST = globalThis.__RSC_MANIFEST || {};
+globalThis.__RSC_MANIFEST["/auth/page"] = {
+  moduleLoading: {
+    prefix: ""
+  },
+  clientModules: {
+    "[project]/client/node_modules/next/dist/esm/client/components/layout-router.js": {
+      id: 8165,
+      name: "*",
+      chunks: ["/_next/static/chunks/3w__m5k330aj8.js", "/_next/static/chunks/18oxav464xdkv.js"],
+      async: false
+    },
+    "[project]/client/node_modules/next/dist/esm/client/components/render-from-template-context.js": {
+      id: 73400,
+      name: "*",
+      chunks: ["/_next/static/chunks/3w__m5k330aj8.js", "/_next/static/chunks/18oxav464xdkv.js"],
+      async: false
+    },
+    "[project]/client/node_modules/next/dist/esm/client/components/client-page.js": {
+      id: 28079,
+      name: "*",
+      chunks: ["/_next/static/chunks/3w__m5k330aj8.js", "/_next/static/chunks/18oxav464xdkv.js"],
+      async: false
+    },
+    "[project]/client/node_modules/next/dist/esm/client/components/client-segment.js": {
+      id: 54139,
+      name: "*",
+      chunks: ["/_next/static/chunks/3w__m5k330aj8.js", "/_next/static/chunks/18oxav464xdkv.js"],
+      async: false
+    },
+    "[project]/client/node_modules/next/dist/esm/client/components/http-access-fallback/error-boundary.js": {
+      id: 94304,
+      name: "*",
+      chunks: ["/_next/static/chunks/3w__m5k330aj8.js", "/_next/static/chunks/18oxav464xdkv.js"],
+      async: false
+    },
+    "[project]/client/node_modules/next/dist/esm/lib/framework/boundary-components.js": {
+      id: 79101,
+      name: "*",
+      chunks: ["/_next/static/chunks/3w__m5k330aj8.js", "/_next/static/chunks/18oxav464xdkv.js"],
+      async: false
+    },
+    "[project]/client/node_modules/next/dist/esm/lib/metadata/generate/icon-mark.js": {
+      id: 57304,
+      name: "*",
+      chunks: ["/_next/static/chunks/3w__m5k330aj8.js", "/_next/static/chunks/18oxav464xdkv.js"],
+      async: false
+    },
+    "[project]/client/components/ui/toast.tsx": {
+      id: 45281,
+      name: "*",
+      chunks: ["/_next/static/chunks/3w__m5k330aj8.js", "/_next/static/chunks/18oxav464xdkv.js"],
+      async: false
+    },
+    "[project]/client/components/dialogs/auto-update-dialog.tsx": {
+      id: 9727,
+      name: "*",
+      chunks: ["/_next/static/chunks/3w__m5k330aj8.js", "/_next/static/chunks/18oxav464xdkv.js"],
+      async: false
+    },
+    "[project]/client/node_modules/next/dist/client/components/builtin/global-error.js": {
+      id: 76920,
+      name: "*",
+      chunks: ["/_next/static/chunks/3w__m5k330aj8.js", "/_next/static/chunks/18oxav464xdkv.js"],
+      async: false
+    },
+    "[project]/client/components/utils/topbar.tsx": {
+      id: 18308,
+      name: "*",
+      chunks: ["/_next/static/chunks/3w__m5k330aj8.js", "/_next/static/chunks/18oxav464xdkv.js", "/_next/static/chunks/3qjt9x4c0z54c.js"],
+      async: false
+    },
+    "[project]/client/app/auth/page.tsx": {
+      id: 98051,
+      name: "*",
+      chunks: ["/_next/static/chunks/3w__m5k330aj8.js", "/_next/static/chunks/18oxav464xdkv.js", "/_next/static/chunks/3qjt9x4c0z54c.js", "/_next/static/chunks/2pfvrzul6179x.js"],
+      async: false
+    }
+  },
+  ssrModuleMapping: {
+    "8165": {
+      "*": {
+        id: 14492,
+        name: "*",
+        chunks: ["server/chunks/ssr/[root-of-the-server]__02b1mii._.js", "server/chunks/ssr/client_1pug_cc._.js", "server/chunks/ssr/client_0-bolk0._.js", "server/chunks/ssr/097k_next_dist_0efu-5t._.js"],
+        async: false
+      }
+    },
+    "73400": {
+      "*": {
+        id: 62489,
+        name: "*",
+        chunks: ["server/chunks/ssr/[root-of-the-server]__02b1mii._.js", "server/chunks/ssr/client_1pug_cc._.js", "server/chunks/ssr/client_0-bolk0._.js", "server/chunks/ssr/097k_next_dist_0efu-5t._.js"],
+        async: false
+      }
+    },
+    "28079": {
+      "*": {
+        id: 80403,
+        name: "*",
+        chunks: ["server/chunks/ssr/[root-of-the-server]__02b1mii._.js", "server/chunks/ssr/client_1pug_cc._.js", "server/chunks/ssr/client_0-bolk0._.js", "server/chunks/ssr/097k_next_dist_0efu-5t._.js"],
+        async: false
+      }
+    },
+    "54139": {
+      "*": {
+        id: 53057,
+        name: "*",
+        chunks: ["server/chunks/ssr/[root-of-the-server]__02b1mii._.js", "server/chunks/ssr/client_1pug_cc._.js", "server/chunks/ssr/client_0-bolk0._.js", "server/chunks/ssr/097k_next_dist_0efu-5t._.js"],
+        async: false
+      }
+    },
+    "94304": {
+      "*": {
+        id: 81571,
+        name: "*",
+        chunks: ["server/chunks/ssr/[root-of-the-server]__02b1mii._.js", "server/chunks/ssr/client_1pug_cc._.js", "server/chunks/ssr/client_0-bolk0._.js", "server/chunks/ssr/097k_next_dist_0efu-5t._.js"],
+        async: false
+      }
+    },
+    "79101": {
+      "*": {
+        id: 17875,
+        name: "*",
+        chunks: ["server/chunks/ssr/[root-of-the-server]__02b1mii._.js", "server/chunks/ssr/client_1pug_cc._.js", "server/chunks/ssr/client_0-bolk0._.js", "server/chunks/ssr/097k_next_dist_0efu-5t._.js"],
+        async: false
+      }
+    },
+    "57304": {
+      "*": {
+        id: 93745,
+        name: "*",
+        chunks: ["server/chunks/ssr/[root-of-the-server]__02b1mii._.js", "server/chunks/ssr/client_1pug_cc._.js", "server/chunks/ssr/client_0-bolk0._.js", "server/chunks/ssr/097k_next_dist_0efu-5t._.js"],
+        async: false
+      }
+    },
+    "45281": {
+      "*": {
+        id: 22370,
+        name: "*",
+        chunks: ["server/chunks/ssr/[root-of-the-server]__02b1mii._.js", "server/chunks/ssr/client_1pug_cc._.js", "server/chunks/ssr/client_0-bolk0._.js", "server/chunks/ssr/097k_next_dist_0efu-5t._.js"],
+        async: false
+      }
+    },
+    "9727": {
+      "*": {
+        id: 45222,
+        name: "*",
+        chunks: ["server/chunks/ssr/[root-of-the-server]__02b1mii._.js", "server/chunks/ssr/client_1pug_cc._.js", "server/chunks/ssr/client_0-bolk0._.js", "server/chunks/ssr/097k_next_dist_0efu-5t._.js"],
+        async: false
+      }
+    },
+    "76920": {
+      "*": {
+        id: 76738,
+        name: "*",
+        chunks: ["server/chunks/ssr/[root-of-the-server]__02b1mii._.js", "server/chunks/ssr/client_1pug_cc._.js", "server/chunks/ssr/client_0-bolk0._.js", "server/chunks/ssr/097k_next_dist_0efu-5t._.js", "server/chunks/ssr/097k_0ktkhw1._.js"],
+        async: false
+      }
+    },
+    "18308": {
+      "*": {
+        id: 62576,
+        name: "*",
+        chunks: ["server/chunks/ssr/[root-of-the-server]__02b1mii._.js", "server/chunks/ssr/client_1pug_cc._.js", "server/chunks/ssr/client_0-bolk0._.js", "server/chunks/ssr/097k_next_dist_0efu-5t._.js", "server/chunks/ssr/client_store_0rthxt2._.js", "server/chunks/ssr/097k_next_dist_13-noyk._.js", "server/chunks/ssr/client_1rmd81n._.js"],
+        async: false
+      }
+    },
+    "98051": {
+      "*": {
+        id: 28427,
+        name: "*",
+        chunks: ["server/chunks/ssr/[root-of-the-server]__02b1mii._.js", "server/chunks/ssr/client_1pug_cc._.js", "server/chunks/ssr/client_0-bolk0._.js", "server/chunks/ssr/097k_next_dist_0efu-5t._.js", "server/chunks/ssr/client_store_0rthxt2._.js", "server/chunks/ssr/097k_next_dist_13-noyk._.js", "server/chunks/ssr/client_1rmd81n._.js", "server/chunks/ssr/client_12zasyv._.js", "server/chunks/ssr/097k_next_012b57j._.js"],
+        async: false
+      }
+    }
+  },
+  edgeSSRModuleMapping: {},
+  rscModuleMapping: {
+    "8165": {
+      "*": {
+        id: 12116,
+        name: "*",
+        chunks: [],
+        async: false
+      }
+    },
+    "73400": {
+      "*": {
+        id: 61186,
+        name: "*",
+        chunks: [],
+        async: false
+      }
+    },
+    "28079": {
+      "*": {
+        id: 96555,
+        name: "*",
+        chunks: [],
+        async: false
+      }
+    },
+    "54139": {
+      "*": {
+        id: 68332,
+        name: "*",
+        chunks: [],
+        async: false
+      }
+    },
+    "94304": {
+      "*": {
+        id: 43142,
+        name: "*",
+        chunks: [],
+        async: false
+      }
+    },
+    "79101": {
+      "*": {
+        id: 78530,
+        name: "*",
+        chunks: [],
+        async: false
+      }
+    },
+    "57304": {
+      "*": {
+        id: 89017,
+        name: "*",
+        chunks: [],
+        async: false
+      }
+    },
+    "45281": {
+      "*": {
+        id: 754,
+        name: "*",
+        chunks: [],
+        async: false
+      }
+    },
+    "9727": {
+      "*": {
+        id: 56136,
+        name: "*",
+        chunks: [],
+        async: false
+      }
+    },
+    "76920": {
+      "*": {
+        id: 45236,
+        name: "*",
+        chunks: [],
+        async: false
+      }
+    },
+    "18308": {
+      "*": {
+        id: 97024,
+        name: "*",
+        chunks: [],
+        async: false
+      }
+    },
+    "98051": {
+      "*": {
+        id: 33946,
+        name: "*",
+        chunks: [],
+        async: false
+      }
+    }
+  },
+  edgeRscModuleMapping: {},
+  entryCSSFiles: {
+    "[project]/client/app/layout": [{
+      path: "static/chunks/0yz-1u3tq4o1h.css",
+      inlined: false
+    }, {
+      path: "static/chunks/18g7v11zmdvkx.css",
+      inlined: false
+    }],
+    "[project]/client/node_modules/next/dist/client/components/builtin/global-error": [{
+      path: "static/chunks/0yz-1u3tq4o1h.css",
+      inlined: false
+    }, {
+      path: "static/chunks/18g7v11zmdvkx.css",
+      inlined: false
+    }],
+    "[project]/client/app/auth/layout": [{
+      path: "static/chunks/0yz-1u3tq4o1h.css",
+      inlined: false
+    }, {
+      path: "static/chunks/18g7v11zmdvkx.css",
+      inlined: false
+    }],
+    "[project]/client/app/auth/page": [{
+      path: "static/chunks/0yz-1u3tq4o1h.css",
+      inlined: false
+    }, {
+      path: "static/chunks/18g7v11zmdvkx.css",
+      inlined: false
+    }]
+  },
+  entryJSFiles: {
+    "[project]/client/app/layout": ["static/chunks/3w__m5k330aj8.js", "static/chunks/18oxav464xdkv.js"],
+    "[project]/client/node_modules/next/dist/client/components/builtin/global-error": ["static/chunks/3w__m5k330aj8.js", "static/chunks/18oxav464xdkv.js"],
+    "[project]/client/app/auth/layout": ["static/chunks/3w__m5k330aj8.js", "static/chunks/18oxav464xdkv.js", "static/chunks/3qjt9x4c0z54c.js"],
+    "[project]/client/app/auth/page": ["static/chunks/3w__m5k330aj8.js", "static/chunks/18oxav464xdkv.js", "static/chunks/3qjt9x4c0z54c.js", "static/chunks/2pfvrzul6179x.js"]
+  }
+};

@@ -1,0 +1,14 @@
+var R = require("../../chunks/ssr/[turbopack]_runtime.js")("server/app/auth/page.js");
+R.c("server/chunks/ssr/[root-of-the-server]__0s59pc0._.js");
+R.c("server/chunks/ssr/097k_next_dist_1te93v1._.js");
+R.c("server/chunks/ssr/[root-of-the-server]__1k9b1l9._.js");
+R.c("server/chunks/ssr/[root-of-the-server]__0negl7u._.js");
+R.c("server/chunks/ssr/[root-of-the-server]__10kftv0._.js");
+R.c("server/chunks/ssr/097k_next_dist_client_components_16kv2me._.js");
+R.c("server/chunks/ssr/097k_next_dist_client_components_builtin_forbidden_1ewfj91.js");
+R.c("server/chunks/ssr/097k_next_dist_client_components_builtin_unauthorized_17i1zzx.js");
+R.c("server/chunks/ssr/097k_next_dist_client_components_builtin_global-error_1d3e1qs.js");
+R.c("server/chunks/ssr/client_0b2h0-j._.js");
+R.c("server/chunks/ssr/client__next-internal_server_app_auth_page_actions_1f7_do7.js");
+R.m(19109);
+module.exports = R.m(19109).exports;

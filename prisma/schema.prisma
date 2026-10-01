@@ -1,0 +1,113 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 1. บัญชีผู้ใช้ Facebook
+model Account {
+  id          String     @id // รหัส User ID (Facebook UID)
+  name        String
+  profileUrl  String?
+  avatarUrl   String?
+  avatarPath  String?
+  sessionPath String?
+  fbId        String?
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  groups      Group[]
+  stats       AccountStats?
+}
+
+// 2. กลุ่มโพสต์ (หมวดหมู่)
+model Group {
+  id          Int          @id @default(autoincrement())
+  accountId   String?
+  name        String
+  content     String       @default("")
+  comments    String       @default("")
+  reaction       String?      // LIKE, LOVE, CARE, HAHA, WOW, SAD, ANGRY
+  isActive       Boolean      @default(true)
+  randomContent  Boolean      @default(false)
+  randomImage    Boolean      @default(false)
+  randomReaction Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  account     Account?     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  links       GroupLink[]
+  images      GroupImage[]
+
+  @@unique([accountId, name])
+}
+
+// 3. รายการลิงก์กลุ่มเป้าหมาย (ติดตามสถานะรายลิงก์)
+model GroupLink {
+  id           Int       @id @default(autoincrement())
+  groupId      Int
+  url          String
+  status       String    @default("PENDING") // PENDING, SUCCESS, FAILED
+  lastPostedAt DateTime?
+
+  group        Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+}
+
+// 4. ไฟล์รูปภาพของกลุ่ม
+model GroupImage {
+  id        Int      @id @default(autoincrement())
+  groupId   Int
+  fileName  String
+  filePath  String
+  fileSize  Int?
+  mimeType  String?
+  createdAt DateTime @default(now())
+
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+}
+
+// 7. ตั้งค่าระบบ (Settings)
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// 8. สถิติการโพสต์ระดับรายบัญชี (Per Account Stats)
+model AccountStats {
+  id        Int      @id @default(autoincrement())
+  accountId String   @unique // เชื่อมโยง 1-to-1 กับ Account
+  total     Int      @default(0) // ยอดโพสต์รวมทั้งหมด
+  success   Int      @default(0) // โพสต์สำเร็จ
+  failed    Int      @default(0) // โพสต์ล้มเหลว
+  pending   Int      @default(0) // โพสต์รออนุมัติ
+  post      Int      @default(0) // จำนวนโพสต์
+  comment   Int      @default(0) // จำนวนคอมเมนต์
+  reaction  Int      @default(0) // จำนวนรีแอคชัน
+  updatedAt DateTime @updatedAt
+
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+// 9. สถิติการโพสต์ภาพรวมทั้งหมด และสถิติรายวัน (All & Daily Stats)
+model GlobalStats {
+  id        String   @id @default("all") // ค่าเริ่มต้น "all" สำหรับยอดรวมทั้งหมด หรือใช้วันที่ "YYYY-MM-DD"
+  date      String?  // วันที่ YYYY-MM-DD สำหรับดึงข้อมูลใส่กราฟ Activity ย้อนหลัง
+  total     Int      @default(0) // ยอดโพสต์รวมทั้งหมด
+  success   Int      @default(0) // สำเร็จรวม
+  failed    Int      @default(0) // ล้มเหลวรวม
+  pending   Int      @default(0) // รออนุมัติรวม
+  updatedAt DateTime @updatedAt
+}
+
+// 10. ระบบคีย์การใช้งาน (License Key)
+model Key {
+  id   Int    @id @default(autoincrement())
+  code String
+  hwid String
+}
+
+//

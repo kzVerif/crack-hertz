@@ -1,0 +1,12 @@
+{
+  "name": "hertz-bot",
+  "version": "1.0.0",
+  "description": "Hertz Auto Post Bot Engine",
+  "main": "worker/login.js",
+  "scripts": {
+    "login": "node worker/login.js"
+  },
+  "dependencies": {
+    "playwright": "^1.50.0"
+  }
+}

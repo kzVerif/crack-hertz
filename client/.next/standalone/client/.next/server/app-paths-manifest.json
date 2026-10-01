@@ -1,0 +1,15 @@
+{
+  "/(user)/accounts/page": "app/(user)/accounts/page.js",
+  "/(user)/logger/page": "app/(user)/logger/page.js",
+  "/(user)/page": "app/(user)/page.js",
+  "/(user)/settings/advance/page": "app/(user)/settings/advance/page.js",
+  "/(user)/settings/data/page": "app/(user)/settings/data/page.js",
+  "/(user)/settings/help/page": "app/(user)/settings/help/page.js",
+  "/(user)/settings/page": "app/(user)/settings/page.js",
+  "/(user)/settings/update/page": "app/(user)/settings/update/page.js",
+  "/(user)/worker/page": "app/(user)/worker/page.js",
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/auth/page": "app/auth/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js"
+}
